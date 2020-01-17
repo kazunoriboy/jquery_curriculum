@@ -66,8 +66,64 @@
       //  </div>
       // </li>
       //
-      //
-      //
+
+      $(function() {
+        var parameter   = {
+              applicationId: '1019399324990976605',
+              keyword: '',
+              hits: 20,
+              page: 1,
+        };
+        var prevKeyword = '';
+
+        $('.search__btn').on('click', function() { 
+          parameter.keyword = $('#js-search-word').val();
+          if (parameter.keyword !== prevKeyword) init();
+          $.ajax({ 
+            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+            type : 'GET',
+            datatype: 'json',
+            data: parameter,
+          }).done(function(data) {
+            if (data.count === 0) {
+              showMessage();
+            } else {
+              showResult(data.Items);
+              if (parameter.page < data.pageCount) parameter.page++;
+            }
+            prevKeyword = parameter.keyword;
+          }).fail(function(e) {
+            console.log(e.responseText);
+          });
+        });
+
+        function init() {
+          parameter.page = 1;
+          $('.message').remove();
+          $('.lists').empty();
+        };
+
+        function showMessage() {
+          $('.lists').before('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>');
+        }
+
+        function showResult(result) {
+          var template = '';
+          $.each(result, function(index, item) {
+            template += `<li class='lists__item'>
+                <div class='lists__item__inner'>
+                  <a href='${item.Item.itemUrl}' class='lists__item__link' target='_blank'>
+                    <img src='${item.Item.largeImageUrl}' class='lists__item__img' alt='${item.Item.title}'>
+                    <p class='lists__item__detail'>作品名：${item.Item.title}</p>
+                    <p class='lists__item__detail'>作者　：${item.Itemauthor}</p>
+                    <p class='lists__item__detail'>出版社：${item.Item.publisherName}</p>
+                  </a>
+                </div>
+              </li>`;
+          });
+          $('.lists').html(template);
+        }
+      });
     </script>
   </body>
 </html>
