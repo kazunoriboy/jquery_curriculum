@@ -34,6 +34,70 @@
       // .data() 要素のdata属性を取得します。
       // .width() 要素の幅を取得します。
       // .length 要素の個数を取得します。
+
+      $(function(){
+        var itemsWidth = [];
+        var totalWidth = 0;
+        var $slider    = $('.slider-list');
+        var length     = $slider.children().length;
+        var current    = 0;
+
+        for (var i = 0; i < length; i++) {
+          if (i === 0) { 
+            itemsWidth[i] = 0;
+            continue; 
+          }
+          var target = $slider.find('img')[i];
+          totalWidth -= $(target).width()
+          itemsWidth[i] = totalWidth;
+        }
+
+        $('.slider-ctrl-btn').on('click', function(){
+          if ($slider.is(':animated')) return false; 
+          ($(this).data('ctrl') === 'prev') ? prev() : next();
+        });
+
+        function prev() {
+          current--;
+          if (current < 0) current = length - 1;
+          var position = itemsWidth[current] + 'px';
+          $slider.animate({left: position}, 500);
+        };
+
+        function next() {
+          current++;
+          if (current > length - 1) current %= length;
+          var position = itemsWidth[current] + 'px';
+          $slider.animate({left: position}, 500);
+        };
+      })
+
+      // $(function(){
+      //   var $slider = $('.slider-list');
+      //   var length  = $slider.children().length;
+      //   var current = 0;
+        
+      //   $('.slider-ctrl-btn').on('click', function(){
+      //     if ($slider.is(':animated')) return false; 
+      //     var width = $($slider.find('img')[current]).width();
+      //     ($(this).data('ctrl') === 'prev') ? prev(width) : next(width);
+      //   });
+
+      //   function prev(width) {
+      //     current--;
+      //     if (current < 0) current = length - 1;
+      //     var position = -(width * (current)) + 'px';
+      //     $slider.animate({left: position}, 500);
+      //   };
+
+      //   function next(width) {
+      //     current++;
+      //     if (current > length - 1) current %= length;
+      //     var position = -(width * (current)) + 'px';
+      //     $slider.animate({left: position}, 500);
+      //   };
+      // })
+
     </script>
   </body>
 </html>
