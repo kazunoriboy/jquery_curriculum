@@ -42,6 +42,25 @@
       // </li>
       //
       // このテンプレートに取得してきた中身を入れて表示します。
+      $(function(){
+        var template = '';
+        $.ajax({
+          url: './data.json'
+        })
+        .done(function(data) {
+          $.each(data, function(idx, arr) {
+            $.each(arr, function(index, item) {
+              template += `
+                <li class="colorList__item">
+                  <p class="colorList__title" style="background-color: ${item.hexValue};"> 
+                    ${item.colorName}
+                  </p>
+                </li>`;
+              });
+            });
+            $('.colorList').html(template);
+          });
+      });
     </script>
   </body>
 </html>
