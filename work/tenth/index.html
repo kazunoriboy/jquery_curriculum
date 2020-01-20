@@ -74,31 +74,28 @@
               hits: 20,
               page: 1,
         };
-        var state = {
-          isLastPage: false,
-          displayMessage: false,
-          prevKeyword: '',
-        };
+        var isLastPage　= false;
+        var prevKeyword = '';
 
         $('.search__btn').on('click', function() { 
           parameter.keyword = $('#js-search-word').val();
-          if (parameter.keyword !== state.prevKeyword) init();
+          if (parameter.keyword !== prevKeyword) init();
           $.ajax({ 
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
             type : 'GET',
             datatype: 'json',
             data: parameter,
           }).done(function(data) {
-            if (state.isLastPage && !state.displayMessage) {
+            if (isLastPage) {
               noMorePageMessage();
-            } else if (data.count === 0 && !state.displayMessage) {
+            } else if (data.count === 0) {
               notFoundMessage();
             } else {
               showResult(data.Items);
-              if (parameter.page === data.pageCount) state.isLastPage = true;
+              if (parameter.page === data.pageCount) isLastPage = true;
               parameter.page++;
             }
-            state.prevKeyword = parameter.keyword;
+            prevKeyword = parameter.keyword;
           }).fail(function(e) {
             responseErrorMessage();
           });
@@ -106,42 +103,39 @@
 
         function init() {
           parameter.page = 1;
-          state.isLastPage = false;
-          state.displayMessage = false;
+          isLastPage = false;
           $('.message').remove();
           $('.lists').empty();
         };
 
         function notFoundMessage() {
+          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
           $('.lists').before('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>');
-          state.displayMessage = true;
-
         } 
 
         function noMorePageMessage() {
+          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
           $('.lists').before('<div class="message">これ以上はありません</div>');
-          state.displayMessage = true;
         }
 
         function responseErrorMessage() {
           if (typeof $('.message') !== 'undefined') ($('.message')).remove();
           $('.lists').before('<div class="message">通信に失敗しました。インターネットの接続をご確認ください</div>');
-          state.displayMessage = true;
         }
 
         function showResult(result) {
           var template = '';
           $.each(result, function(index, item) {
             template += `<li class='lists__item'>
-                <div class='lists__item__inner'>
-                  <a href='${item.Item.itemUrl}' class='lists__item__link' target='_blank'>
-                    <img src='${item.Item.largeImageUrl}' class='lists__item__img' alt='${item.Item.title}'>
-                    <p class='lists__item__detail'>作品名：${item.Item.title}</p>
-                    <p class='lists__item__detail'>作者　：${item.Itemauthor}</p>
-                    <p class='lists__item__detail'>出版社：${item.Item.publisherName}</p>
-                  </a>
-                </div>
-              </li>`;
+                          <div class='lists__item__inner'>
+                            <a href='${item.Item.itemUrl}' class='lists__item__link' target='_blank'>
+                              <img src='${item.Item.largeImageUrl}' class='lists__item__img' alt='${item.Item.title}'>
+                              <p class='lists__item__detail'>作品名：${item.Item.title}</p>
+                              <p class='lists__item__detail'>作者　：${item.Itemauthor}</p>
+                              <p class='lists__item__detail'>出版社：${item.Item.publisherName}</p>
+                            </a>
+                          </div>
+                        </li>`;
           });
           $('.lists').prepend(template);
         }
