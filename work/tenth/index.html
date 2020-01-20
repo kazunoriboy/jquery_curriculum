@@ -109,17 +109,17 @@
         };
 
         function notFoundMessage() {
-          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
+          $('.message').remove();
           $('.lists').before('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>');
         } 
 
         function noMorePageMessage() {
-          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
+          $('.message').remove();
           $('.lists').before('<div class="message">これ以上はありません</div>');
         }
 
         function responseErrorMessage() {
-          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
+          $('.message').remove();
           $('.lists').before('<div class="message">通信に失敗しました。インターネットの接続をご確認ください</div>');
         }
 
