@@ -68,43 +68,65 @@
       //
 
       $(function() {
-        var parameter   = {
+        var parameter = {
               applicationId: '1019399324990976605',
               keyword: '',
               hits: 20,
               page: 1,
         };
-        var prevKeyword = '';
+        var state = {
+          isLastPage: false,
+          displayMessage: false,
+          prevKeyword: '',
+        };
 
         $('.search__btn').on('click', function() { 
           parameter.keyword = $('#js-search-word').val();
-          if (parameter.keyword !== prevKeyword) init();
+          if (parameter.keyword !== state.prevKeyword) init();
           $.ajax({ 
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
             type : 'GET',
             datatype: 'json',
             data: parameter,
           }).done(function(data) {
-            if (data.count === 0) {
-              showMessage();
+            if (state.isLastPage && !state.displayMessage) {
+              noMorePageMessage();
+            } else if (data.count === 0 && !state.displayMessage) {
+              notFoundMessage();
             } else {
               showResult(data.Items);
-              if (parameter.page < data.pageCount) parameter.page++;
+              if (parameter.page === data.pageCount) state.isLastPage = true;
+              parameter.page++;
             }
-            prevKeyword = parameter.keyword;
+            state.prevKeyword = parameter.keyword;
           }).fail(function(e) {
-            console.log(e.responseText);
+            responseErrorMessage();
           });
         });
 
         function init() {
           parameter.page = 1;
+          state.isLastPage = false;
+          state.displayMessage = false;
           $('.message').remove();
           $('.lists').empty();
         };
 
-        function showMessage() {
+        function notFoundMessage() {
           $('.lists').before('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>');
+          state.displayMessage = true;
+
+        } 
+
+        function noMorePageMessage() {
+          $('.lists').before('<div class="message">これ以上はありません</div>');
+          state.displayMessage = true;
+        }
+
+        function responseErrorMessage() {
+          if (typeof $('.message') !== 'undefined') ($('.message')).remove();
+          $('.lists').before('<div class="message">通信に失敗しました。インターネットの接続をご確認ください</div>');
+          state.displayMessage = true;
         }
 
         function showResult(result) {
@@ -121,7 +143,7 @@
                 </div>
               </li>`;
           });
-          $('.lists').html(template);
+          $('.lists').prepend(template);
         }
       });
     </script>
